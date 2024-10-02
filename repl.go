@@ -38,20 +38,25 @@ func startRepl() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Print("Pokedex > ")
+		scanner.Scan()
 
-		if !scanner.Scan() {
-			break
+		input := sanitizeInput(scanner.Text())
+		if len(input) == 0 {
+			continue
 		}
-		input := scanner.Text()
 
-		switch strings.ToLower(input) {
-		case "exit":
-			fmt.Println("Bye!")
-			return
-		case "help":
-			fmt.Printf("\nUsage:\nhelp: Displays this help message\nexit: Exits the program")
-		default:
-			fmt.Printf("\nUsage:\nhelp: Displays this help message\nexit: Exits the program")
+		commandName := input[0]
+
+		command, exists := getCommands()[commandName]
+		if exists {
+			err := command.callback()
+			if err != nil {
+				fmt.Println(err)
+			}
+			continue
+		} else {
+			fmt.Printf("Unknown command: %s", commandName)
+			continue
 		}
 	}
 }
