@@ -36,16 +36,16 @@ func (c *Client) ListLocations(pageURL *string) (RespShallowLocations, error) {
 	}
 	defer resp.Body.Close()
 
-	dat, err := io.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return RespShallowLocations{}, err
 	}
 
-	locationsResp := RespShallowLocations{}
-	err = json.Unmarshal(dat, &locationsResp)
+	locationResp := RespShallowLocations{}
+	err = json.Unmarshal(data, &locationResp)
 	if err != nil {
 		return RespShallowLocations{}, err
 	}
 
-	return locationsResp, nil
+	return locationResp, nil
 }
