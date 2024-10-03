@@ -5,12 +5,20 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/probablynoval/pokedexcli/api"
 )
+
+type config struct {
+	apiClient api.Client
+	Next      *string
+	Prev      *string
+}
 
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(*config) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -25,6 +33,16 @@ func getCommands() map[string]cliCommand {
 			description: "Exit the program",
 			callback:    commandExit,
 		},
+		"map": {
+			name:        "map",
+			description: "Show the next page of locations",
+			callback:    commandMap,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Show the previous page of locations",
+			callback:    commandMapb,
+		},
 	}
 }
 
@@ -34,7 +52,7 @@ func sanitizeInput(input string) []string {
 	return words
 }
 
-func startRepl() {
+func startRepl(conf *config) {
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Print("Pokedex > ")
@@ -49,13 +67,13 @@ func startRepl() {
 
 		command, exists := getCommands()[commandName]
 		if exists {
-			err := command.callback()
+			err := command.callback(conf)
 			if err != nil {
 				fmt.Println(err)
 			}
 			continue
 		} else {
-			fmt.Printf("Unknown command: %s", commandName)
+			fmt.Printf("Unknown command: %s\n", commandName)
 			continue
 		}
 	}
