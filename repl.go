@@ -11,6 +11,8 @@ import (
 
 type config struct {
 	apiClient api.Client
+	Location  api.RespDeepLocations
+	Pokedex   map[string]api.RespPokemon
 	Next      *string
 	Prev      *string
 }
@@ -48,6 +50,11 @@ func getCommands() map[string]cliCommand {
 			name:        "explore",
 			description: "Explore a map for Pokémon",
 			callback:    commandExplore,
+		},
+		"catch": {
+			name:        "catch",
+			description: "Attempt to catch a Pokémon",
+			callback:    commandCatch,
 		},
 	}
 }

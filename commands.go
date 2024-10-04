@@ -3,6 +3,8 @@ package main
 import (
 	"errors"
 	"fmt"
+	"math/rand"
+	_ "math/rand"
 	"net/url"
 	"os"
 	"path"
@@ -74,16 +76,57 @@ func commandExplore(conf *config, args ...string) error {
 	}
 	mapName := args[0]
 
-	location, err := conf.apiClient.ExploreLocation(mapName)
+	location, err := conf.apiClient.GetLocation(mapName)
 	if err != nil {
 		return err
 	}
+
+	conf.Location = location
 
 	fmt.Printf("Exploring %s...\n", location.Name)
 	fmt.Println("Found Pokemon:")
 	for _, p := range location.PokemonEncounters {
 		fmt.Printf(" - %s\n", p.Pokemon.Name)
 	}
+
+	return nil
+}
+
+func commandCatch(conf *config, args ...string) error {
+	if len(args) != 1 {
+		return errors.New("Incorrect number of arguments, please enter one Pokémon's name")
+	}
+	pokemonName := args[0]
+	pokemonFound := false
+	var pokemonIndex int
+
+	for i, p := range conf.Location.PokemonEncounters {
+		if p.Pokemon.Name == pokemonName {
+			pokemonFound = true
+			pokemonIndex = i
+			break
+		}
+	}
+
+	if !pokemonFound {
+		return errors.New("Incorrect argument, the Pokémon does not exist at this location")
+	}
+
+	pokemonURL := conf.Location.PokemonEncounters[pokemonIndex].Pokemon.URL
+	pokemon, err := conf.apiClient.GetPokemon(pokemonURL)
+	if err != nil {
+		return err
+	}
+
+	catchChance := 500 - pokemon.BaseExperience
+	caught := rand.Intn(500) < catchChance
+
+	if !caught {
+		fmt.Printf("%s has fled!\n", pokemon.Name)
+		return nil
+	}
+	fmt.Printf("%s was caught!\n", pokemon.Name)
+	conf.Pokedex[pokemon.Name] = pokemon
 
 	return nil
 }

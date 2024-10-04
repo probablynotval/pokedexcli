@@ -8,8 +8,10 @@ import (
 
 func main() {
 	client := api.NewClient(5*time.Second, 5*time.Minute)
+	pokedex := map[string]api.RespPokemon{}
 	conf := &config{
 		apiClient: client,
+		Pokedex:   pokedex,
 	}
 
 	startRepl(conf)

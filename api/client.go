@@ -70,8 +70,8 @@ func (c *Client) ListLocations(pageURL *string) (RespShallowLocations, error) {
 	return locationResp, nil
 }
 
-func (c *Client) ExploreLocation(locName string) (RespDeepLocations, error) {
-	url := baseURL + "/location-area" + "/" + locName
+func (c *Client) GetLocation(locationName string) (RespDeepLocations, error) {
+	url := baseURL + "/location-area" + "/" + locationName
 
 	data, err := getData(c, url)
 	if err != nil {
@@ -85,4 +85,19 @@ func (c *Client) ExploreLocation(locName string) (RespDeepLocations, error) {
 	}
 
 	return locationResp, nil
+}
+
+func (c *Client) GetPokemon(pokemonURL string) (RespPokemon, error) {
+	data, err := getData(c, pokemonURL)
+	if err != nil {
+		return RespPokemon{}, err
+	}
+
+	pokemonResp := RespPokemon{}
+	err = json.Unmarshal(data, &pokemonResp)
+	if err != nil {
+		return RespPokemon{}, err
+	}
+
+	return pokemonResp, nil
 }
