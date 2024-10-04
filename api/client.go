@@ -69,3 +69,20 @@ func (c *Client) ListLocations(pageURL *string) (RespShallowLocations, error) {
 
 	return locationResp, nil
 }
+
+func (c *Client) ExploreLocation(locName string) (RespDeepLocations, error) {
+	url := baseURL + "/location-area" + "/" + locName
+
+	data, err := getData(c, url)
+	if err != nil {
+		return RespDeepLocations{}, err
+	}
+
+	locationResp := RespDeepLocations{}
+	err = json.Unmarshal(data, &locationResp)
+	if err != nil {
+		return RespDeepLocations{}, err
+	}
+
+	return locationResp, nil
+}

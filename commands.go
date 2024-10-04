@@ -8,7 +8,7 @@ import (
 	"path"
 )
 
-func commandHelp(conf *config) error {
+func commandHelp(conf *config, args ...string) error {
 	fmt.Println()
 	fmt.Println("Usage:")
 	fmt.Println()
@@ -19,13 +19,13 @@ func commandHelp(conf *config) error {
 	return nil
 }
 
-func commandExit(conf *config) error {
+func commandExit(conf *config, args ...string) error {
 	fmt.Println("Bye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandMap(conf *config) error {
+func commandMap(conf *config, args ...string) error {
 	locationResp, err := conf.apiClient.ListLocations(conf.Next)
 	if err != nil {
 		return err
@@ -44,27 +44,47 @@ func commandMap(conf *config) error {
 	return nil
 }
 
-func commandMapb(conf *config) error {
+func commandMapb(conf *config, args ...string) error {
 	if conf.Prev == nil {
 		return errors.New("You're on the first page silly!")
 	}
 
-	locationResp, err := conf.apiClient.ListLocations(conf.Prev)
+	location, err := conf.apiClient.ListLocations(conf.Prev)
 	if err != nil {
 		return err
 	}
 
-	conf.Next = locationResp.Next
-	conf.Prev = locationResp.Prev
+	conf.Next = location.Next
+	conf.Prev = location.Prev
 
-	for i, location := range locationResp.Results {
-		locationId, err := locationId(locationResp.Results[i].URL)
+	for i, loc := range location.Results {
+		locationId, err := locationId(location.Results[i].URL)
 		if err != nil {
 			return err
 		}
 
-		fmt.Printf("%s. %s\n", locationId, location.Name)
+		fmt.Printf("%s. %s\n", locationId, loc.Name)
 	}
+	return nil
+}
+
+func commandExplore(conf *config, args ...string) error {
+	if len(args) != 1 {
+		return errors.New("Incorrect number of arguments, please enter one location's name to explore")
+	}
+	mapName := args[0]
+
+	location, err := conf.apiClient.ExploreLocation(mapName)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Exploring %s...\n", location.Name)
+	fmt.Println("Found Pokemon:")
+	for _, p := range location.PokemonEncounters {
+		fmt.Printf(" - %s\n", p.Pokemon.Name)
+	}
+
 	return nil
 }
 
