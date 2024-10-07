@@ -158,6 +158,24 @@ func commandInspect(conf *config, args ...string) error {
 	return nil
 }
 
+func commandPokedex(conf *config, args ...string) error {
+	if len(args) != 0 {
+		fmt.Println()
+		fmt.Println("Arguments ignored, command takes no arguments")
+		fmt.Println()
+	}
+
+	if len(conf.pokedex) == 0 {
+		return errors.New("You have not caught any Pokémon")
+	}
+
+	for _, pokemon := range conf.pokedex {
+		fmt.Printf(" - %s\n", pokemon.Name)
+	}
+
+	return nil
+}
+
 func locationId(rawURL string) (string, error) {
 	u, err := url.Parse(rawURL)
 	if err != nil {
