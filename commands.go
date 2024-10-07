@@ -96,6 +96,7 @@ func commandCatch(conf *config, args ...string) error {
 	if len(args) != 1 {
 		return errors.New("Incorrect number of arguments, please enter one Pokémon's name")
 	}
+
 	pokemonName := args[0]
 	pokemonFound := false
 	var pokemonIndex int
@@ -127,6 +128,32 @@ func commandCatch(conf *config, args ...string) error {
 	}
 	fmt.Printf("%s was caught!\n", pokemon.Name)
 	conf.pokedex[pokemon.Name] = pokemon
+
+	return nil
+}
+
+func commandInspect(conf *config, args ...string) error {
+	if len(args) != 1 {
+		return errors.New("Incorrect number of arguments, please enter one Pokémon's name")
+	}
+
+	pokemonName := args[0]
+
+	pokemon, caught := conf.pokedex[pokemonName]
+	if !caught {
+		return errors.New("You have not caught that Pokémon")
+	}
+
+	fmt.Printf("Height: %v\n", pokemon.Height)
+	fmt.Printf("Weight: %v\n", pokemon.Weight)
+	fmt.Println("Stats:")
+	for _, s := range pokemon.Stats {
+		fmt.Printf(" - %s: %v\n", s.Stat.Name, s.BaseStat)
+	}
+	fmt.Println("Types:")
+	for _, t := range pokemon.Types {
+		fmt.Printf(" - %s\n", t.Type.Name)
+	}
 
 	return nil
 }
