@@ -28,13 +28,13 @@ func commandExit(conf *config, args ...string) error {
 }
 
 func commandMap(conf *config, args ...string) error {
-	locationResp, err := conf.apiClient.ListLocations(conf.Next)
+	locationResp, err := conf.apiClient.ListLocations(conf.next)
 	if err != nil {
 		return err
 	}
 
-	conf.Next = locationResp.Next
-	conf.Prev = locationResp.Prev
+	conf.next = locationResp.Next
+	conf.prev = locationResp.Prev
 
 	for i, location := range locationResp.Results {
 		locationId, err := locationId(locationResp.Results[i].URL)
@@ -47,17 +47,17 @@ func commandMap(conf *config, args ...string) error {
 }
 
 func commandMapb(conf *config, args ...string) error {
-	if conf.Prev == nil {
+	if conf.prev == nil {
 		return errors.New("You're on the first page silly!")
 	}
 
-	location, err := conf.apiClient.ListLocations(conf.Prev)
+	location, err := conf.apiClient.ListLocations(conf.prev)
 	if err != nil {
 		return err
 	}
 
-	conf.Next = location.Next
-	conf.Prev = location.Prev
+	conf.next = location.Next
+	conf.prev = location.Prev
 
 	for i, loc := range location.Results {
 		locationId, err := locationId(location.Results[i].URL)
@@ -81,7 +81,7 @@ func commandExplore(conf *config, args ...string) error {
 		return err
 	}
 
-	conf.Location = location
+	conf.location = location
 
 	fmt.Printf("Exploring %s...\n", location.Name)
 	fmt.Println("Found Pokemon:")
@@ -100,7 +100,7 @@ func commandCatch(conf *config, args ...string) error {
 	pokemonFound := false
 	var pokemonIndex int
 
-	for i, p := range conf.Location.PokemonEncounters {
+	for i, p := range conf.location.PokemonEncounters {
 		if p.Pokemon.Name == pokemonName {
 			pokemonFound = true
 			pokemonIndex = i
@@ -112,7 +112,7 @@ func commandCatch(conf *config, args ...string) error {
 		return errors.New("Incorrect argument, the Pokémon does not exist at this location")
 	}
 
-	pokemonURL := conf.Location.PokemonEncounters[pokemonIndex].Pokemon.URL
+	pokemonURL := conf.location.PokemonEncounters[pokemonIndex].Pokemon.URL
 	pokemon, err := conf.apiClient.GetPokemon(pokemonURL)
 	if err != nil {
 		return err
@@ -126,7 +126,7 @@ func commandCatch(conf *config, args ...string) error {
 		return nil
 	}
 	fmt.Printf("%s was caught!\n", pokemon.Name)
-	conf.Pokedex[pokemon.Name] = pokemon
+	conf.pokedex[pokemon.Name] = pokemon
 
 	return nil
 }

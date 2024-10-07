@@ -11,7 +11,7 @@ func main() {
 	pokedex := map[string]api.RespPokemon{}
 	conf := &config{
 		apiClient: client,
-		Pokedex:   pokedex,
+		pokedex:   pokedex,
 	}
 
 	startRepl(conf)

@@ -11,10 +11,10 @@ import (
 
 type config struct {
 	apiClient api.Client
-	Location  api.RespDeepLocations
-	Pokedex   map[string]api.RespPokemon
-	Next      *string
-	Prev      *string
+	location  api.RespDeepLocations
+	pokedex   map[string]api.RespPokemon
+	next      *string
+	prev      *string
 }
 
 type cliCommand struct {
